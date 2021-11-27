@@ -59,10 +59,12 @@ tmp <- earnings_teachers %>%
                                       ifelse(grade92 == 45 , 'Prof' , 'PhD' )))
 
 P95 <- function(x){ quantile(x,.95,na.rm=T)}
-datasummary( (Gender  + `Education`) * `Weekly wage` + `Hourly wage` + `Ln Hourly wage`  ~ Mean + SD + Min + Max + Median + P95 + N , data = tmp ) %>%  kable_styling(full_width = TRUE)
+datasummary( (Gender  + `Education`) * `Weekly wage` + `Hourly wage` + `Ln Hourly wage`  ~ Mean + SD + Min + Max + Median + P95 + N , data = tmp ) %>%  kable_styling(full_width = TRUE , latex_options = "striped" )
 
 ```
 
+
+\pagebreak
 
 ```{r , echo = FALSE , warning = FALSE, out.width = "75%"}
 # Lowess graphs
@@ -70,7 +72,7 @@ p1 <- ggplot( data = earnings_teachers , aes( x = female , y = log_wages_per_hou
   geom_point( color = 'red', size = 2, shape = 16, ) + 
   scale_x_continuous(expand=c(0.01, 0.01), limits = c(0, 1),   breaks=seq(0, 1,   by=1)) + 
   scale_y_continuous(expand=c(0.01, 0.01),limits = c(0, 5), breaks=seq(0, 5, by=1)) +
-  geom_smooth( method = 'loess', formula = y ~ x) +
+  geom_smooth( method = 'lm', formula = y ~ x) +
   labs(x = "Gender",y = "Log of wages (USD)")
 
 
@@ -78,7 +80,7 @@ p2 <- ggplot( data = earnings_teachers , aes( x = grade92, y = log_wages_per_hou
   geom_point( color = 'red', size = 2, shape = 16, ) + 
   scale_x_continuous(expand=c(0.01, 0.01), limits = c(44, 46),   breaks=seq(44, 46,   by=1)) + 
   scale_y_continuous(expand=c(0.01, 0.01),limits = c(0, 5), breaks=seq(0, 5, by=1)) +
-  geom_smooth( method = 'loess', formula = y ~ x) +
+  geom_smooth( method = 'lm', formula = y ~ x) +
   labs(x = "Level of Education",y = "Log of wages (USD)")
 
 
@@ -87,6 +89,7 @@ linear_assoc_figs <- ggarrange(p1, p2,
                               hjust = -0.6,
                               ncol = 1, nrow = 2)
 linear_assoc_figs
+
 
 ```
 
