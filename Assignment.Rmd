@@ -1,7 +1,5 @@
 ---
 title: "Assignment 1"
-author: "A. BOGNAR"
-date: "11/27/2021"
 output: pdf_document
 ---
 
@@ -13,6 +11,8 @@ library(tidyverse)
 library(modelsummary)
 library(kableExtra)
 library(ggpubr)
+library(fixest)
+library(xtable)
 
 
 cps_earnings <- read_csv("https://osf.io/4ay9x/download")
@@ -51,20 +51,20 @@ table(earnings_teachers$female)
 
 tmp <- earnings_teachers %>% 
       select( female  ,  grade92 ,  
-              'Weekly earnings' =  earnwke , 
-              'Hourly Earnings' = wages_per_hour ,
-              'Ln Hourly Earnings' = log_wages_per_hour ) %>% 
+              'Weekly wage' =  earnwke , 
+              'Hourly wage' = wages_per_hour ,
+              'Ln Hourly wage' = log_wages_per_hour ) %>% 
       mutate( 'Gender' = ifelse(female == 0 , 'Male' , 'Female' ) ,
-              'Level of Education' = ifelse(grade92 == 44 , 'Masters' , 
-                                      ifelse(grade92 == 45 , 'Professional Degree' , 'PhD' )))
+              'Education' = ifelse(grade92 == 44 , 'Masters' , 
+                                      ifelse(grade92 == 45 , 'Prof' , 'PhD' )))
 
 P95 <- function(x){ quantile(x,.95,na.rm=T)}
-datasummary( (Gender  + `Level of Education`) * `Weekly earnings` + `Hourly Earnings` + `Ln Hourly Earnings`  ~ Mean + SD + Min + Max + Median + P95 + N , data = tmp )
+datasummary( (Gender  + `Education`) * `Weekly wage` + `Hourly wage` + `Ln Hourly wage`  ~ Mean + SD + Min + Max + Median + P95 + N , data = tmp ) %>%  kable_styling(full_width = TRUE)
 
 ```
 
 
-```{r , echo = FALSE , warning = FALSE}
+```{r , echo = FALSE , warning = FALSE, out.width = "75%"}
 # Lowess graphs
 p1 <- ggplot( data = earnings_teachers , aes( x = female , y = log_wages_per_hour )) +
   geom_point( color = 'red', size = 2, shape = 16, ) + 
@@ -82,17 +82,51 @@ p2 <- ggplot( data = earnings_teachers , aes( x = grade92, y = log_wages_per_hou
   labs(x = "Level of Education",y = "Log of wages (USD)")
 
 
-p3 <- ggplot( data = earnings_teachers , aes( x = female, y =  grade92)) +
-  geom_point( color = 'red', size = 2, shape = 16, ) + 
-  scale_x_continuous(expand=c(0.01, 0.01), limits = c(0, 1),   breaks=seq(0, 1,   by=1)) + 
-  scale_y_continuous(expand=c(0.01, 0.01),limits = c(44, 46), breaks=seq(44, 46, by=1)) +
-  geom_smooth( method = 'loess', formula = y ~ x) +
-  labs(x = "Gender",y = "Level of Education")
 
 linear_assoc_figs <- ggarrange(p1, p2,
                               hjust = -0.6,
                               ncol = 1, nrow = 2)
 linear_assoc_figs
+
+```
+
+\pagebreak
+
+```{r , echo = FALSE , warning = FALSE}
+# Regressions + Regression table
+
+# Log wage ~ Gender
+reg0 <- feols( log_wages_per_hour ~ female , data = earnings_teachers , vcov = 'hetero' )
+
+# Log wage ~ Education
+reg1 <- feols( log_wages_per_hour ~ grade92 , data = earnings_teachers , vcov = 'hetero' )
+
+# Multiple regression 
+reg2 <- feols( log_wages_per_hour ~ female + grade92 , data = earnings_teachers  , vcov = 'hetero' )
+
+earnings_teachers_extra <- earnings_teachers %>% 
+                            mutate( master = as.numeric( grade92 == 44 ),
+                                    professional = as.numeric( grade92 == 45 ),
+                                    phd = as.numeric( grade92 == 46 ) )
+
+# Multivariate Regression with Education as qualitative
+
+reg3 <- feols( log_wages_per_hour ~ female + master + professional , data = earnings_teachers_extra , vcov = 'hetero' )
+
+reg4 <- feols( log_wages_per_hour ~ female + professional + phd , data = earnings_teachers_extra , vcov = 'hetero' )
+
+# Compare the results
+# etable( reg0 , reg1 , reg2 , reg3 , reg4 )
+
+#intercept is base variable if x1 is 0, intercept + category 1 is cat1 if x1,x2... is 0 
+#cat1,2.... is difference from base
+
+msummary(list(reg0, reg1, reg2, reg3, reg4 ),
+         fmt="%.3f",
+         gof_omit = 'DF|Deviance|Log.Lik.|F|R2 Within|AIC|BIC|R2 Pseudo|Std.Errors',
+         stars=c('*' = .05, '**' = .01)
+) %>%  kable_styling(full_width = TRUE)
+
 
 ```
 
