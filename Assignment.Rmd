@@ -1,0 +1,58 @@
+---
+title: "Assignment 1"
+author: "A. BOGNAR"
+date: "11/27/2021"
+output: pdf_document
+---
+
+```{r }
+# Data Loading and cleaning
+
+rm(list=ls())
+library(tidyverse)
+library(modelsummary)
+library(kableExtra)
+
+
+cps_earnings <- read_csv("https://osf.io/4ay9x/download")
+
+  
+  #https://data.nber.org/morg/docs/cpsx.pdf
+
+
+cps_earnings_filtered <- cps_earnings %>% filter( grade92 >= 44 & grade92 <= 46 ) %>%
+  filter( age >= 24 & grade92 <= 65 ) %>% 
+  filter( lfsr94 == "Employed-At Work" ) %>%
+  filter( uhours >= 20 ) 
+
+
+cps_earnings_filtered <- cps_earnings_filtered %>% 
+                        mutate( female =  as.numeric( sex == 2 )) %>%
+                         mutate( wages_per_hour = earnwke / uhours) %>%
+                         mutate( log_wages_per_hour = log( wages_per_hour )) 
+
+cps_earnings_filtered_teach <- cps_earnings_filtered %>%
+          mutate( sample = ifelse( occ2012 == 2200 , 1 , 0 ) ) 
+
+earnings_teachers <- cps_earnings_filtered_teach %>% filter( sample == 1 )
+
+table(earnings_teachers$grade92)
+# 480 males, 471 females
+
+```
+
+```{r}
+# data table
+
+P95 <- function(x){ quantile(x,.95,na.rm=T)}
+datasummary( female + wages_per_hour + log_wages_per_hour + earnwke + grade92 ~ Mean + SD + Min + Max + Median + P95 + N , data = earnings_teachers )
+
+```
+
+
+```{r}
+# Unconditional wage gap
+
+
+```
+
