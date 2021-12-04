@@ -1,8 +1,6 @@
 ---
 title: "DA2 Assignment 2 - Barcelona Hotel Ratings"
 output: pdf_document
-urlcolor: blue
-linkcolor: red
 ---
 
 # Data
@@ -36,18 +34,20 @@ hotels <- data %>%
 
 
 hotels <- hotels %>% 
-  mutate( logprice = log( price ),
-          rating_cutoff = 0 +
-            1 * as.numeric( hotels$rating_reviewcount >= 100 ) +
-            1 * as.numeric( hotels$rating_reviewcount >= 1000 ) )
+  mutate( logprice = log( price ))
+          # ,
+          # rating_cutoff = 0 +
+          #   1 * as.numeric( hotels$rating_reviewcount >= 100 ) +
+          #   1 * as.numeric( hotels$rating_reviewcount >= 1000 ) 
 
 
 hotels$highly_rated <- ifelse(hotels$rating >= 4, 1, 0)
 
 
 ```
+From the [$\color{red}{\text{Hotels-Europe dataset}}$](https://osf.io/r6uqb/) I analyzed Hotels in Barcelona, how different variables relate to the probability of being highly rated by customers. High rating means 4+.
 
-
+I included ratings from 2017 December weekdays, where key variables were not missing. A single hotel was priced above 4500 Euros. The hotel had 1 star and was nearly twice as expensive as the second one. I considered it to be an erroneous record and excluded it. Lastly, I created ln price variable since the price distribution was lognormal and the main binary variable which is 1 for highly rated hotels and 0 for ratings below 4.
 
 # Data Summary
 
@@ -71,7 +71,10 @@ datasummary( (`High or Low Rating (1/0)` = highly_rated ) +
 
 ```
 
+The table shows variables I considered to include in the models. Missing is the tripadvisor rating which correlate with user ratings. In my opinion this should be used for external validity rather than as a control. The lowess graph of Number of nights with High rating showed no association: same mean and spread of ratings regardless of customers spending 1 or 4 nights, thus I excluded it. Important findings in the table:
 
+- Most, 71%, of hotels are highly rated.Number of observations is 674.
+- There are some huge extreme values in prices and distance.
 
 ```{r , include = FALSE , warning = FALSE}
 # Keeping only variables used for regressions for faster processing
@@ -80,6 +83,8 @@ hotels <- hotels %>% dplyr::select( rating , distance , stars , price , logprice
 ```
 
 # Regression exploration and findings
+
+The 3 explanatory variables are distance, stars and log prices. Below are the loess regressions of distance and stars.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=8, fig.height = 3, fig.align="center"}
 
@@ -106,9 +111,25 @@ association_figs
 
 ```
 
+Distance has an interesting pattern. For hotel less than 1 mile from the center, distance is positively related with the chance of high rating. Between 1 and 2 miles the opposite is true. For longer distances farther hotels are more likely to be positively rated. Possible explanations include: more crowded areas are less enjoyable. The city might have multiple centers, so hotels far from this point might be closer to other attractions.
+
+Stars are straight forward. Hotels with more stars generally have higher chance of good ratings.
+
+I included distance with 2 splines and stars with a linear regression in my models. I found the graph of log prices to have 2 knots. See the log price and other regressions in the Appendix.
+
 # Regression Models
 
+**Model 1** shows the **linear probability model**. A hotel with 1 extra star has 14.6% higher chance for good rating with the same distance from city center and price level. The standard error is relatively small, this is a significant finding. 
+The difference between a hotel 0 and 1 mile from the city center is 16.4% higher chance for good rating with stars and prices being equal. This finding is less practical since no hotel is exactly at the city center. Any distance father the differences are not significant. Even in the 0-1 mile range, the standard error is high, the difference is only significant at 95% confidence level.
+As for prices, under the first spline (ln price = 5) we find a positive association, 1% higher price is associated with 0.5% higher chance for good rating with distance and stars being the same. Between the first and second knot we find nearly the opposite while above the second spline (ln price = 5.6) a smaller positive association. The log price levels are hard to interpret. They roughly translate back to 150 and 270 Euros. At all 3 intervals the findings are significant.
 
+**Model 2** shows the **coefficients of the logit model**. The logit model transforms the LPM model so that no predictions can be outside the 0-1 range. We don't interpret its coefficients.  
+
+Rather **Model 3** shows the **marginal effect** of the **logit** model. These have the same interpretation as the LPM coefficients. We can see they are slightly lower with the same level of significance.
+
+**Models 4 and 5** show the coefficients then the marginal effects of the **probit** model. Slightly below the LPM the marginal effects have the same explanation.
+
+The model differences are not statistically significant as the confidence intervals heavily overlap. Hotels with high chance at a good rating, tend to have 5 stars, be about 1 mile away from the center and have higher prices except in the second quarter (150 to 270 Euros) of prices.
 
 ```{r, echo=FALSE}
 
@@ -155,7 +176,9 @@ msummary(list(lpm, logit, logit_marg, probit, probit_marg),
 #1st spline is roughly 150 euro price, 2nd is about 270
 ```
 
-# Difference in model predictions
+# Comparing model predictions
+
+Below is a comparison between the predictions of the models. They differ more as we go towards 0 and 1. In the Appendix I show that only the LPM has predictions above 1.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=8, fig.height = 3, fig.align="center"}
 
