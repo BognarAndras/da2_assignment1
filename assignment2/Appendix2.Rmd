@@ -59,7 +59,7 @@ hotels %>%
   facet_wrap(~key, scales = "free") +
   geom_histogram()
 
-datasummary_skim( hotels )
+
 
 
 numeric_hotels <- keep( hotels , is.numeric )
@@ -67,6 +67,9 @@ cT <- round( cor( numeric_hotels , use = "complete.obs") , 2 )
 cT[ upper.tri( cT ) ] <- NA
 melted_cormat <- melt( cT , na.rm = TRUE)
 melted_cormat
+
+
+datasummary_skim( hotels )
 ```
 
 Notably, we can see that prices have lognormal distribution. They are also easier to interpret in % differences.
