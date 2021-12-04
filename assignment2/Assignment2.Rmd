@@ -73,7 +73,7 @@ datasummary( (`High or Low Rating (1/0)` = highly_rated ) +
 
 The table shows variables I considered to include in the models. Missing is the tripadvisor rating which correlate with user ratings. In my opinion this should be used for external validity rather than as a control. The lowess graph of Number of nights with High rating showed no association: same mean and spread of ratings regardless of customers spending 1 or 4 nights, thus I excluded it. Important findings in the table:
 
-- Most, 71%, of hotels are highly rated.Number of observations is 674.
+- Most, 74%, of hotels are highly rated.Number of observations is 674.
 - There are some huge extreme values in prices and distance.
 
 ```{r , include = FALSE , warning = FALSE}
