@@ -115,7 +115,7 @@ Distance has an interesting pattern. For hotel less than 1 mile from the center,
 
 Stars are straight forward. Hotels with more stars generally have higher chance of good ratings.
 
-I included distance with 2 splines and stars with a linear regression in my models. I found the graph of log prices to have 2 knots. See the log price and other regressions in the Appendix.
+I included distance with 2 splines and stars with a linear regression in my models. I found the graph of log prices to have 2 knots. See the log price and other regressions in the [$\color{red}{\text{Appendix}}$](https://github.com/BognarAndras/da2_assignment1/blob/main/assignment2/Appendix2.pdf).
 
 # Regression Models
 
@@ -178,7 +178,7 @@ msummary(list(lpm, logit, logit_marg, probit, probit_marg),
 
 # Comparing model predictions
 
-Below is a comparison between the predictions of the models. They differ more as we go towards 0 and 1. In the Appendix I show that only the LPM has predictions above 1.
+Below is a comparison between the predictions of the models. They differ more as we go towards 0 and 1. In the [$\color{red}{\text{Appendix}}$](https://github.com/BognarAndras/da2_assignment1/blob/main/assignment2/Appendix2.pdf) I show that only the LPM has predictions above 1.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=8, fig.height = 3, fig.align="center"}
 
