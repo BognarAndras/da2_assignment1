@@ -76,7 +76,7 @@ datasummary( (`High or Low Rating (1/0)` = highly_rated ) +
 ```{r , include = FALSE , warning = FALSE}
 # Keeping only variables used for regressions for faster processing
 
-hotels <- hotels %>% dplyr::select( rating , distance , stars , price , rating_reviewcount , highly_rated ) 
+hotels <- hotels %>% dplyr::select( rating , distance , stars , price , logprice , rating_reviewcount , highly_rated ) 
 ```
 
 # Regression exploration and findings
@@ -96,8 +96,8 @@ chck_sp <- function( x_var , x_lab ){
 }
 
 
-g1 <- chck_sp( hotels$distance , "distance" )
-g2 <- chck_sp( hotels$stars , "stars" )
+g1 <- chck_sp( hotels$distance , "Distance from city center (miles)" )
+g2 <- chck_sp( hotels$stars , "Stars of hotel" )
 
 association_figs <- ggarrange(g1, g2,
                        hjust = -0.6,
@@ -107,3 +107,75 @@ association_figs
 ```
 
 # Regression Models
+
+
+
+```{r, echo=FALSE}
+
+
+lpm <- feols( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+               + lspline( logprice , c( 5 , 5.6 ) )
+               , data = hotels , vcov = "hetero")
+
+logit <- glm( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+             + lspline( logprice , c( 5 , 5.6 ) )
+             , data = hotels , family='binomial')
+
+logit_marg <- logitmfx(formula = highly_rated ~ stars 
+                       + lspline( distance , c( 1 , 2 ) ) 
+                       + lspline( logprice , c( 5 , 5.6 ) )
+                       , data = hotels , atmean=FALSE)
+
+probit <- glm(highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+              + lspline( logprice , c( 5 , 5.6 ) )
+              , data = hotels , family=binomial(link="probit"))
+
+
+probit_marg <- probitmfx(formula = highly_rated ~ stars 
+                         + lspline( distance , c( 1 , 2 ) ) 
+                         + lspline( logprice , c( 5 , 5.6 ) )
+                         , data = hotels , atmean=FALSE)
+
+
+cm <- c('(Intercept)' = 'Constant' ,
+        'lspline(distance, c(1, 2))1' = 'Distance under 1 mile' ,
+        'lspline(distance, c(1, 2))2' = 'Distance 1 to 2 miles' ,
+        'lspline(distance, c(1, 2))3' = 'Distance above 2 miles',
+        'lspline(logprice, c(5, 5.6))1' = 'Log price below 1st spline',
+        'lspline(logprice, c(5, 5.6))2' = 'Log price 1st to 2nd spline',
+        'lspline(logprice, c(5, 5.6))3' = 'Log price above 2nd spline')
+msummary(list(lpm, logit, logit_marg, probit, probit_marg),
+         fmt="%.3f",
+         gof_omit = 'Std|DF|Deviance|Log.Lik.|F|R2 Adj.|AIC|BIC|R2|PseudoR2',
+         stars=c('*' = .05, '**' = .01),
+         coef_rename = cm,
+         coef_omit = 'as.factor(country)*'
+)
+
+#1st spline is roughly 150 euro price, 2nd is about 270
+```
+
+# Difference in model predictions
+
+```{r, echo=FALSE, warning=FALSE, fig.width=8, fig.height = 3, fig.align="center"}
+
+pred_lpm <- predict(lpm)
+hotels$pred_probit<- predict.glm(probit, type="response") 
+hotels$pred_logit <- predict.glm(logit, type="response")
+
+g5 <- ggplot(data = hotels) +
+  geom_point(aes(x=pred_lpm, y=pred_probit, color="Probit"), size=0.4,  shape=16) +
+  geom_point(aes(x=pred_lpm, y=pred_logit,  color="Logit"), size=0.4,  shape=16) +
+  geom_line(aes(x=pred_lpm, y=pred_lpm,    color="45 degree line"), size=0.4) +
+  labs(x = "Predicted probability of getting high rating (LPM)"
+       , y="Predicted probability")+
+  scale_y_continuous(expand = c(0.00,0.0), limits = c(0,1), breaks = seq(0,1,0.1)) +
+  scale_x_continuous(expand = c(0.00,0.0), limits = c(0,1), breaks = seq(0,1,0.1)) +
+  scale_color_manual(name = "", values=c("purple", "green", "blue")) +
+  theme_classic()+
+  theme(legend.position=c(0.55,0.08),
+        legend.direction = "horizontal",
+        legend.text = element_text(size = 10))
+g5
+```
+

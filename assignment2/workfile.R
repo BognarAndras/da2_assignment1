@@ -175,7 +175,7 @@ reg2
 etable( reg1 , reg2 )
 
 
-reg3 <- feols( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+lpm <- feols( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
                + lspline( logprice , c( 5 , 5.6 ) )
                , data = hotels , vcov = "hetero")
 lpm
