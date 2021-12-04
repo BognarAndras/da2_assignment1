@@ -1,0 +1,80 @@
+---
+title: "DA2 Assignment 2 - Barcelona Hotel Ratings"
+output: pdf_document
+urlcolor: blue
+linkcolor: red
+---
+
+# Data
+
+```{r , include = FALSE , warning = FALSE}
+# Data Loading and cleaning
+
+library(tidyverse)
+library(lspline)
+library(fixest)
+library(modelsummary)
+library(kableExtra)
+library(mfx)
+
+
+hotels_europe_price <- read_csv("https://osf.io/p6tyr/download")
+hotels_europe_features <- read_csv("https://osf.io/utwjs/download")
+data <- left_join(hotels_europe_price, hotels_europe_features, by = "hotel_id")
+rm(hotels_europe_price,hotels_europe_features)
+
+
+hotels <- data %>% 
+  filter( !is.na( stars )) %>%
+  filter( city_actual=="Barcelona" ) %>%
+  filter( !is.na( distance )) %>%
+  filter( !is.na( rating )) %>%
+  filter( year == 2017, month == 12 , weekend == 0)  %>% 
+  filter( accommodation_type  == "Hotel")%>% 
+  filter( price  <= 4500)
+
+
+hotels <- hotels %>% 
+  mutate( logprice = log( price ),
+          rating_cutoff = 0 +
+            1 * as.numeric( hotels$rating_reviewcount >= 100 ) +
+            1 * as.numeric( hotels$rating_reviewcount >= 1000 ) )
+
+
+hotels$highly_rated <- ifelse(hotels$rating >= 4, 1, 0)
+
+
+```
+
+
+
+# Data Summary
+
+```{r , echo = FALSE , warning = FALSE}
+# data table
+
+P95 <- function(x){quantile(x,0.95,na.rm=T)}
+P05 <- function(x){quantile(x,0.05,na.rm=T)}
+datasummary( (`High or Low Rating (1/0)` = highly_rated ) + 
+               (`Avg. rating` = rating ) + 
+               (`Price` = price ) + 
+               (`Ln Price` = logprice )+
+               (`Distance from center` = distance) + 
+               (`Stars` = stars) + 
+               (`Number of nights` = nnights) ~
+               Mean + Median + SD + Min + Max + 
+               P05 + P95 + N , 
+             data = hotels ,
+             title = 'Descriptive statistics') %>% 
+  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
+```
+
+
+
+```{r , include = FALSE , warning = FALSE}
+# Keeping only variables used for regressions for faster processing
+
+hotels <- hotels %>% dplyr::select( rating , distance , stars , price , nnights , rating_reviewcount) 
+```
+
