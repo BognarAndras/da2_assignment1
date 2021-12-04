@@ -1,0 +1,145 @@
+---
+title: "DA2 Assignment 2 Appendix"
+output: pdf_document
+---
+
+# Distributions, Correlations
+
+```{r , include = FALSE , warning = FALSE}
+# Data Loading and cleaning
+
+library(tidyverse)
+library(lspline)
+library(fixest)
+library(modelsummary)
+library(kableExtra)
+library(mfx)
+library(ggpubr)
+library(reshape2)
+
+
+
+hotels_europe_price <- read_csv("https://osf.io/p6tyr/download")
+hotels_europe_features <- read_csv("https://osf.io/utwjs/download")
+data <- left_join(hotels_europe_price, hotels_europe_features, by = "hotel_id")
+rm(hotels_europe_price,hotels_europe_features)
+
+
+hotels <- data %>% 
+  filter( !is.na( stars )) %>%
+  filter( city_actual=="Barcelona" ) %>%
+  filter( !is.na( distance )) %>%
+  filter( !is.na( rating )) %>%
+  filter( year == 2017, month == 12 , weekend == 0)  %>% 
+  filter( accommodation_type  == "Hotel")%>% 
+  filter( price  <= 4500)
+
+
+hotels <- hotels %>% 
+  mutate( logprice = log( price ))
+          # ,
+          # rating_cutoff = 0 +
+          #   1 * as.numeric( hotels$rating_reviewcount >= 100 ) +
+          #   1 * as.numeric( hotels$rating_reviewcount >= 1000 ) 
+
+
+hotels$highly_rated <- ifelse(hotels$rating >= 4, 1, 0)
+
+
+```
+
+
+
+```{r , echo = FALSE , warning=FALSE , error=FALSE , message = FALSE}
+hotels %>%
+  keep(is.numeric) %>% 
+  gather() %>% 
+  ggplot(aes(value) ) +
+  theme_bw()+
+  facet_wrap(~key, scales = "free") +
+  geom_histogram()
+
+datasummary_skim( hotels )
+
+
+numeric_hotels <- keep( hotels , is.numeric )
+cT <- round( cor( numeric_hotels , use = "complete.obs") , 2 )
+cT[ upper.tri( cT ) ] <- NA
+melted_cormat <- melt( cT , na.rm = TRUE)
+melted_cormat
+```
+
+Notably, we can see that prices have lognormal distribution. They are also easier to interpret in % differences.
+TripAdvisor rating and custome rating have 0.84 correlation. TripAdvisor ratings hopefully largely come from customer ratings so there is likely a big overlap in the two which is why they explain each others variation.
+
+
+# Lowess graphs
+
+```{r , echo = FALSE , warning=FALSE }
+
+
+chck_sp <- function( x_var , x_lab ){
+  ggplot( hotels , aes(x = x_var, y = highly_rated)) +
+    geom_point(color='red',size=2,alpha=0.6) +
+    geom_smooth(method="loess" , formula = y ~ x )+
+    scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.2))+
+    labs(x = x_lab, y = "High-Low Rating") +
+    theme_bw()
+}
+
+
+g1 <- chck_sp( hotels$nnights , "number of nights" )
+g2 <- chck_sp( hotels$logprice , "logprice" ) 
+
+association_figs <- ggarrange(g1, g2,
+                       hjust = -0.6,
+                       ncol = 2, nrow = 1)
+association_figs
+
+```
+
+We can see no association for number of nights spent by customer. For logprices, I decided to add knots at ln price = 5 and ln price = 5.6.
+
+
+# Histogram of 2 nonlinear models' predictions
+
+
+
+```{r , echo = FALSE , warning=FALSE , out.width="50%"}
+probit <- glm(highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+              + lspline( logprice , c( 5 , 5.6 ) )
+              , data = hotels , family=binomial(link="probit"))
+
+logit <- glm( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+             + lspline( logprice , c( 5 , 5.6 ) )
+             , data = hotels , family='binomial')
+
+lpm <- feols( highly_rated ~ stars + lspline( distance , c( 1 , 2 ) ) 
+               + lspline( logprice , c( 5 , 5.6 ) )
+               , data = hotels , vcov = "hetero")
+
+
+hotels$pred_probit<- predict.glm(probit, type="response") 
+hotels$pred_logit <- predict.glm(logit, type="response")
+pred_lpm <- stats::predict(lpm)
+
+
+ggplot( hotels , aes(x = pred_lpm)) +
+  geom_histogram( binwidth = 0.1, fill='navyblue', color = 'white' ) +
+  labs(y = 'Count',x = "Logit predictions") +
+  theme_bw()
+
+ggplot( hotels , aes(x = pred_probit)) +
+  geom_histogram( binwidth = 0.1, fill='navyblue', color = 'white' ) +
+  labs(y = 'Count',x = "Logit predictions") +
+  theme_bw()
+
+ggplot( hotels , aes(x = pred_logit)) +
+  geom_histogram( binwidth = 0.1, fill='navyblue', color = 'white' ) +
+  labs(y = 'Count',x = "Probit predictions") +
+  theme_bw()
+
+
+```
+
+As intended nonlinear models don't have predictions above 1.

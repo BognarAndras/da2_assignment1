@@ -216,7 +216,9 @@ msummary(list(lpm, logit, logit_marg, probit, probit_marg),
 
 
 
-pred_lpm <- predict(lpm)
+pred_lpm <- stats::predict(lpm)
+
+find("predict")
 pred_probit <- predict(lpm)
 pred_logit <- predict(lpm)
 hotels$pred_probit<- predict.glm(probit, type="response") 
