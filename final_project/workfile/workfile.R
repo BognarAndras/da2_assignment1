@@ -1,20 +1,24 @@
-
+rm(list = ls () )
 library(data.table)
 
 life_exp_dt <- read.csv("clean/LIFE_EXP-GLOBAL_DATAFLOW_2015-2018-clean.csv")
+life_exp_wb_dt <- read.csv("clean/World_Bank_Life_Expectancy.csv")
 educ_dt <- read.csv("clean/Table-10-Education-EN-clean.csv")
 soc_dt <- read.csv("clean/Table-12-SocProt-and-Econ-EN-clean.csv")
 econ_dt <- read.csv("clean/Table-15-SocProt-and-Econ-EN-clean.csv")
 mort_dt <- read.csv("clean/Table-2-Child-Mortality-EN-clean.csv")
 health_dt <- read.csv("clean/Table-3-MNH-EN-2.csv")
 
-all(econ_dt$ï..Country == health_dt$ï..Country)
+# all(econ_dt$ï..Country == health_dt$ï..Country)
 
 econ_dt <- data.table(econ_dt)
 econ_dt <- econ_dt[, .('Country' = ï..Country , 'Soc_Prot' = On.social.protection) ]
 
 life_exp_dt <- data.table(life_exp_dt)
 life_exp_dt <- life_exp_dt[, .('Country' = ï..Country , Life_exp ) ]
+
+life_exp_wb_dt <- data.table(life_exp_wb_dt)
+life_exp_wb_dt <- life_exp_wb_dt[, .('Country' = ï..Country.Name , 'Life_exp' = X2018_or_latest ) ]
 
 educ_dt <- data.table(educ_dt)
 educ_dt <- educ_dt[, .('Country' = ï..Country , 'Male_Pre_Prim' = male..before.primary ,
@@ -42,27 +46,27 @@ soc_dt <- data.table(soc_dt)
 soc_dt <- soc_dt[, .('Country' = ï..Country , 'GDPP' = GDP.per.capita ,
                  'Mother_Cov' = Mothers.benefit , 'Child_Cov' = Childrens.benefit ) ]
 
-educ_dt[!(Country %in% life_exp_dt$Country ) , .(Country , Female_Prim)]
+# educ_dt[!(Country %in% life_exp_dt$Country ) , .(Country , Female_Prim)]
 # All missing except Cook Islands, Dominica, Liechtenstein , Marshall Islands
 # Nauru , San 
 # https://data.worldbank.org/indicator/SP.DYN.LE00.IN?locations=DM-LI-MH-NR-SM
 # drop missing
-life_exp_dt <- life_exp_dt[(Country %in% educ_dt$Country )  ]
+
+life_exp_only_wb <- life_exp_wb_dt[!(Country %in% life_exp_dt$Country)]
+life_exp_dt <- rbind(life_exp_dt , life_exp_only_wb)
 
 temp_dt <- Reduce(merge,list(educ_dt , econ_dt , health_dt , mort_dt , soc_dt))
 main_dt <-  merge( life_exp_dt , temp_dt , by = 'Country')
 
 rm( list = c('temp_dt' , 'life_exp_dt' , 'educ_dt' , 'econ_dt' , 
-            'health_dt' , 'mort_dt' , 'soc_dt') )
+            'health_dt' , 'mort_dt' , 'soc_dt' , 'life_exp_only_wb' , 'life_exp_wb_dt'))
 
-main_dt$Male_Low_Sec <- as.numeric(main_dt$Male_Low_Sec)
-main_dt2 <- main_dt
-main_dt2[,2:22] <- lapply(main_dt[,2:22] , function(x){as.numeric(x)})
+main_dt[,2:22] <- lapply(main_dt[,2:22] , function(x){as.numeric(x)})
 
-table(main_dt2$Female_Prim)
+table(main_dt$Female_Prim)
 
 library(ggplot2)
 
-ggplot(main_dt2) +
-  geom_histogram( aes( x= Female_Prim) )
+ggplot(main_dt) +
+  geom_histogram( aes( x= Male_Prim) )
 
