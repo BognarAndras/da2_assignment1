@@ -1,0 +1,132 @@
+"","Sample1","Sample2","Sample3"
+"1","Albania","Albania","Afghanistan"
+"2","Algeria","Argentina","Albania"
+"3","Argentina","Armenia","Algeria"
+"4","Armenia","Australia","Angola"
+"5","Australia","Austria","Argentina"
+"6","Azerbaijan","Azerbaijan","Armenia"
+"7","Bahrain","Bahrain","Bangladesh"
+"8","Bangladesh","Barbados","Barbados"
+"9","Barbados","Belarus","Belarus"
+"10","Belarus","Belize","Belize"
+"11","Belize","Benin","Benin"
+"12","Bhutan","Bhutan","Bhutan"
+"13","Bolivia (Plurinational State of)","Bolivia (Plurinational State of)","Bosnia and Herzegovina"
+"14","Botswana","Brazil","Brazil"
+"15","Brazil","Bulgaria","Burkina Faso"
+"16","Brunei Darussalam","Burkina Faso","Burundi"
+"17","Bulgaria","Burundi","Cambodia"
+"18","Burkina Faso","Cabo Verde","Cameroon"
+"19","Burundi","Cambodia","Central African Republic"
+"20","Cabo Verde","Cameroon","Chad"
+"21","Cambodia","Canada","China"
+"22","Cameroon","Central African Republic","Colombia"
+"23","Central African Republic","Chad","Comoros"
+"24","Chad","Chile","Congo"
+"25","Chile","Colombia","Costa Rica"
+"26","Colombia","Comoros","Cuba"
+"27","Comoros","Costa Rica","Côte d'Ivoire"
+"28","Congo","Cuba","Democratic Republic of the Congo"
+"29","Costa Rica","Cyprus","Dominican Republic"
+"30","Cuba","Côte d'Ivoire","Egypt"
+"31","Cyprus","Djibouti","El Salvador"
+"32","Côte d'Ivoire","Dominican Republic","Eswatini"
+"33","Djibouti","Egypt","Ethiopia"
+"34","Dominican Republic","El Salvador","Gabon"
+"35","Ecuador","Eritrea","Gambia"
+"36","Egypt","Eswatini","Ghana"
+"37","El Salvador","Ethiopia","Guatemala"
+"38","Equatorial Guinea","Finland","Guinea"
+"39","Eritrea","France","Guinea-Bissau"
+"40","Estonia","Georgia","Guyana"
+"41","Eswatini","Ghana","Haiti"
+"42","Ethiopia","Guatemala","Honduras"
+"43","Fiji","Guinea","India"
+"44","Finland","Guyana","Indonesia"
+"45","France","Honduras","Iraq"
+"46","Gambia","India","Jamaica"
+"47","Georgia","Indonesia","Jordan"
+"48","Ghana","Iran (Islamic Republic of)","Kazakhstan"
+"49","Guatemala","Jamaica","Kenya"
+"50","Guinea","Jordan","Kyrgyzstan"
+"51","Guyana","Kuwait","Lao People's Democratic Republic"
+"52","Honduras","Kyrgyzstan","Lesotho"
+"53","India","Lao People's Democratic Republic","Liberia"
+"54","Indonesia","Latvia","Malawi"
+"55","Ireland","Lebanon","Mali"
+"56","Italy","Lesotho","Mauritania"
+"57","Japan","Liberia","Mexico"
+"58","Kazakhstan","Luxembourg","Mongolia"
+"59","Kenya","Malawi","Montenegro"
+"60","Kuwait","Malaysia","Mozambique"
+"61","Kyrgyzstan","Mali","Myanmar"
+"62","Lao People's Democratic Republic","Malta","Namibia"
+"63","Latvia","Marshall Islands","Nepal"
+"64","Lebanon","Mauritania","Niger"
+"65","Lesotho","Mauritius","Nigeria"
+"66","Liberia","Mexico","North Macedonia"
+"67","Luxembourg","Micronesia (Federated States of)","Pakistan"
+"68","Malaysia","Montenegro","Panama"
+"69","Maldives","Morocco","Paraguay"
+"70","Mali","Mozambique","Peru"
+"71","Malta","Myanmar","Philippines"
+"72","Marshall Islands","Nauru","Republic of Moldova"
+"73","Mauritania","Nepal","Rwanda"
+"74","Mauritius","New Zealand","Sao Tome and Principe"
+"75","Mexico","Niger","Senegal"
+"76","Micronesia (Federated States of)","Norway","Serbia"
+"77","Mongolia","Oman","Sierra Leone"
+"78","Montenegro","Pakistan","South Africa"
+"79","Morocco","Panama","South Sudan"
+"80","Mozambique","Papua New Guinea","State of Palestine"
+"81","Namibia","Paraguay","Sudan"
+"82","Nauru","Peru","Suriname"
+"83","Nepal","Philippines","Tajikistan"
+"84","New Zealand","Poland","Thailand"
+"85","Niger","Portugal","Timor-Leste"
+"86","North Macedonia","Qatar","Togo"
+"87","Norway","Republic of Korea","Tunisia"
+"88","Oman","Republic of Moldova","Turkey"
+"89","Pakistan","Romania","Turkmenistan"
+"90","Panama","Russian Federation","Uganda"
+"91","Papua New Guinea","Samoa","Ukraine"
+"92","Paraguay","Sao Tome and Principe","United Republic of Tanzania"
+"93","Peru","Senegal","Uruguay"
+"94","Philippines","Serbia","Viet Nam"
+"95","Poland","Sierra Leone","Yemen"
+"96","Portugal","Slovenia","Zambia"
+"97","Qatar","South Sudan","Zimbabwe"
+"98","Republic of Korea","Sri Lanka",NA
+"99","Republic of Moldova","State of Palestine",NA
+"100","Romania","Suriname",NA
+"101","Russian Federation","Thailand",NA
+"102","Rwanda","Timor-Leste",NA
+"103","Samoa","Togo",NA
+"104","Sao Tome and Principe","Tonga",NA
+"105","Senegal","Turkey",NA
+"106","Serbia","Ukraine",NA
+"107","Sierra Leone","United Arab Emirates",NA
+"108","Slovenia","Uruguay",NA
+"109","Solomon Islands","Uzbekistan",NA
+"110","South Africa","Vanuatu",NA
+"111","South Sudan","Venezuela (Bolivarian Republic of)",NA
+"112","Sri Lanka","Yemen",NA
+"113","State of Palestine","Zimbabwe",NA
+"114","Sudan",NA,NA
+"115","Suriname",NA,NA
+"116","Tajikistan",NA,NA
+"117","Timor-Leste",NA,NA
+"118","Togo",NA,NA
+"119","Tonga",NA,NA
+"120","Turkey",NA,NA
+"121","Uganda",NA,NA
+"122","Ukraine",NA,NA
+"123","United Arab Emirates",NA,NA
+"124","United Republic of Tanzania",NA,NA
+"125","Uruguay",NA,NA
+"126","Uzbekistan",NA,NA
+"127","Vanuatu",NA,NA
+"128","Venezuela (Bolivarian Republic of)",NA,NA
+"129","Yemen",NA,NA
+"130","Zambia",NA,NA
+"131","Zimbabwe",NA,NA
